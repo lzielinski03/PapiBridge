@@ -1,44 +1,61 @@
 package com.besysoft.controller;
 
-import com.besysoft.Test;
+import com.besysoft.entity.User;
 import com.besysoft.webService.Papi;
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RestController;
-
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
 import java.util.ArrayList;
 import java.util.List;
+import stubs.InstanceInfoBean;
 
 import com.besysoft.entity.Process;
-import stubs.ActivityBean;
-import stubs.InstanceInfoBean;
-import stubs.ProcessBean;
-import stubs.StringListBean;
+
+import javax.xml.ws.soap.SOAPFaultException;
+
 
 /**
  * Created by lzielinski on 12/07/2016.
  */
 
 @RestController
+@RequestMapping("/api")
 public class ProcessController {
 
     @CrossOrigin(origins = "*")
-    @RequestMapping(value = "/processes", method = RequestMethod.GET)
-    public List<Process> getProcesses() {
-
-//        Test x = new Test();
-//        x.test();
-
-        Papi papi = new Papi();
-
-        System.out.println("\nprocesses");
-        for (InstanceInfoBean instanceInfoBean : papi.processGetInstances().getInstances()) {
-            System.out.println(instanceInfoBean.getDescription());
-            System.out.println(instanceInfoBean.getParticipant());
-            System.out.println(instanceInfoBean.getActivityName());
-            System.out.println(instanceInfoBean.getProcess());
+    @RequestMapping(value = "/auth", method = RequestMethod.POST, consumes= MediaType.APPLICATION_JSON_VALUE, headers = "content-type=application/json")
+    public ResponseEntity<String> login(@RequestBody User user) {
+        System.out.println(user.getUsername());
+        System.out.println(user.getPassword());
+        try {
+            new Papi(user.getUsername(), user.getPassword()).getCurrentParticipant();
+        } catch(SOAPFaultException e) {
+            //return e.getMessage();
+            return new ResponseEntity<String>("{\"sucess\": \"false\"}", HttpStatus.FORBIDDEN);
         }
+
+        //return "success";
+        return new ResponseEntity<String>("{\"sucess\": \"true\"}", HttpStatus.OK);
+    }
+
+//    @CrossOrigin(origins = "*")
+//    @RequestMapping(value = "/processes", method = RequestMethod.GET)
+//    public Process getProcesses() {
+//
+////        Test x = new Test();
+////        x.test();
+//
+//        Papi papi = new Papi(user.getUsername(), user.getPassword());
+//
+//        System.out.println("\nprocesses");
+//
+//        for (InstanceInfoBean instanceInfoBean : papi.processGetInstances().getInstances()) {
+//            System.out.println(instanceInfoBean.getDescription());
+//            System.out.println(instanceInfoBean.getParticipant());
+//            System.out.println(instanceInfoBean.getActivityName());
+//            System.out.println(instanceInfoBean.getProcess());
+//        }
 
 /*
             System.out.println("Process activities: ");
@@ -57,9 +74,9 @@ public class ProcessController {
             System.out.println("Process active: " + x.isIsActive());
         }*/
 
-        List<Process> result = new ArrayList<>();
-        result.add(new Process(1, "Proces 1"));
-        result.add(new Process(2, "Proces 2"));
-        return result;
-    }
+//        List<Process> result = new ArrayList<>();
+//        result.add(new Process(1, "Proces 1"));
+//        result.add(new Process(2, "Proces 2"));
+//        return new Process(1, "Proces 1");
+//    }
 }

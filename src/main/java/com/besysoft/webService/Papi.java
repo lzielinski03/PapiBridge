@@ -22,8 +22,12 @@ public class Papi {
 
     private static final String SECURITY_NAMESPACE = "http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd";
     private PapiWebService papiWebServicePort;
+    private String username;
+    private String password;
 
-    public Papi() {
+    public Papi(String user, String pass) {
+        this.username = user;
+        this.password = pass;
         /////////////////// Initialize the web service client ///////////////////
         try {
             String endPoint = "http://localhost:8687/papiws/PapiWebServiceEndpoint?wsdl";
@@ -45,10 +49,10 @@ public class Papi {
         }
     }
 
-    private static void addHttpBasicAuthentication(PapiWebService papiWebServicePort) {
+    private  void addHttpBasicAuthentication(PapiWebService papiWebServicePort) {
         Map<String, Object> request = ((BindingProvider) papiWebServicePort).getRequestContext();
-        request.put(BindingProvider.USERNAME_PROPERTY, "asisrrmmnbsf");
-        request.put(BindingProvider.PASSWORD_PROPERTY, "asisrrmmnbsf");
+        request.put(BindingProvider.USERNAME_PROPERTY, this.username);
+        request.put(BindingProvider.PASSWORD_PROPERTY, this.password);
     }
 
     private static void addUsernameTokenProfile(PapiWebService papiWebServicePort) throws SOAPException {
@@ -68,6 +72,14 @@ public class Papi {
         security.addChildElement(token);
         Header header = Headers.create(security);
         ((WSBindingProvider) papiWebServicePort).setOutboundHeaders(header);
+    }
+    
+    public void login() {
+        try {
+            ParticipantBean participantBean = papiWebServicePort.participantCurrent();
+        } catch (OperationException_Exception e) {
+            e.printStackTrace();
+        }
     }
 
     public StringListBean processesGetIds() {
