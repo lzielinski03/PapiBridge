@@ -31,6 +31,13 @@
         </dependency>
 
         <dependency>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-databind</artifactId>
+            <version>2.6.3</version>
+        </dependency>
+
+
+        <dependency>
             <groupId>Fuego</groupId>
             <artifactId>papiws</artifactId>
             <version>6.0</version>

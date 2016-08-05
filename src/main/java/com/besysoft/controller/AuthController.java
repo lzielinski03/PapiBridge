@@ -1,17 +1,12 @@
 package com.besysoft.controller;
 
 import com.besysoft.entity.User;
-import com.besysoft.webService.Papi;
+import com.besysoft.webService.PapiConnection;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import java.util.ArrayList;
-import java.util.List;
-import stubs.InstanceInfoBean;
-
-import com.besysoft.entity.Process;
-
+import javax.xml.ws.WebServiceException;
 import javax.xml.ws.soap.SOAPFaultException;
 
 
@@ -21,21 +16,27 @@ import javax.xml.ws.soap.SOAPFaultException;
 
 @RestController
 @RequestMapping("/api")
-public class ProcessController {
+public class AuthController {
 
     @CrossOrigin(origins = "*")
-    @RequestMapping(value = "/auth", method = RequestMethod.POST, consumes= MediaType.APPLICATION_JSON_VALUE, headers = "content-type=application/json")
+    @RequestMapping(
+            value = "/auth",
+            method = RequestMethod.POST,
+            consumes= MediaType.APPLICATION_JSON_VALUE,
+            headers = "content-type=application/json"
+    )
     public ResponseEntity<String> login(@RequestBody User user) {
         System.out.println(user.getUsername());
         System.out.println(user.getPassword());
         try {
-            new Papi(user.getUsername(), user.getPassword()).getCurrentParticipant();
+            new PapiConnection(user.getUsername(), user.getPassword()).getCurrentParticipant();
         } catch(SOAPFaultException e) {
-            //return e.getMessage();
             return new ResponseEntity<String>("{\"sucess\": \"false\"}", HttpStatus.FORBIDDEN);
+        } catch (WebServiceException e) {
+            e.printStackTrace();
+            return new ResponseEntity<String>("{\"sucess\": \"false\"}", HttpStatus.SERVICE_UNAVAILABLE);
         }
 
-        //return "success";
         return new ResponseEntity<String>("{\"sucess\": \"true\"}", HttpStatus.OK);
     }
 
@@ -46,7 +47,7 @@ public class ProcessController {
 ////        Test x = new Test();
 ////        x.test();
 //
-//        Papi papi = new Papi(user.getUsername(), user.getPassword());
+//        PapiConnection papi = new PapiConnection(user.getUsername(), user.getPassword());
 //
 //        System.out.println("\nprocesses");
 //
