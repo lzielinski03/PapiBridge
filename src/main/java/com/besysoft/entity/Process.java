@@ -11,16 +11,16 @@ public class Process implements Serializable{
 
     public String id;
     public String name;
-    public List<Instance> instances = new ArrayList<>();
+    public List<Activity> activities = new ArrayList<>();
 
     public Process(String id, String name) {
         this.id = id;
         this.name = name;
     }
 
-    public Process(String id, String name, Instance instance) {
+    public Process(String id, String name, Activity activity) {
         this.id = id;
         this.name = name;
-        this.instances.add(instance);
+        this.activities.add(activity);
     }
 }

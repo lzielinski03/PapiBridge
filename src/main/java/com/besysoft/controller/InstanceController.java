@@ -1,5 +1,6 @@
 package com.besysoft.controller;
 
+import com.besysoft.entity.User;
 import com.besysoft.webService.PapiService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -21,8 +22,10 @@ public class InstanceController {
             consumes= MediaType.APPLICATION_JSON_VALUE,
             headers = "content-type=application/json"
     )
-    public ResponseEntity<String> getInstances() {
-        String response = new PapiService("fbrenni", "fbrenni").getInstances();
+    public ResponseEntity<String> getInstances(@RequestBody User user) {
+        System.out.println(user.getUsername());
+        System.out.println(user.getPassword());
+        String response = new PapiService(user.getUsername(), user.getPassword()).getInstances();
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 }
