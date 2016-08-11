@@ -1,9 +1,12 @@
 package com.besysoft.webService;
 
 import com.besysoft.entity.Instance;
+import com.besysoft.utils.Json;
 import com.besysoft.utils.ProcessWrapper;
+import com.besysoft.utils.StringId;
 import stubs.*;
 
+import java.util.Base64;
 import java.util.List;
 
 /**
@@ -17,7 +20,6 @@ public class PapiService {
         this.connection = new PapiConnection(user, pass);
     }
 
-
     public ParticipantBean getCurrentParticipant() {
         ParticipantBean participant = null;
         try {
@@ -26,6 +28,44 @@ public class PapiService {
             e.printStackTrace();
         }
         return participant;
+    }
+
+    public String getInstances() {
+        ProcessWrapper wrapper = new ProcessWrapper();
+        InstanceInfoBean instanceToSend = null;
+        try {
+            for (InstanceInfoBean instance : connection.papi.viewGetInstances("papi-bridge").getInstances()) {
+                instanceToSend = instance;
+
+                wrapper.addInstance(
+                        instance.getProcess(),
+                        connection.papi.processGet(instance.getProcess()).getName(),
+                        instance.getActivityName(),
+                        new Instance(
+                                StringId.encode(instance.getId()),
+                                instance.getDescription(),
+                                instance.getState(),
+                                instance.getReceptionTime(),
+                                instance.getProcessDeadline()
+                        )
+                );
+            }
+        } catch (OperationException_Exception e) {
+            e.printStackTrace();
+        }
+        //deveria(instanceToSend);
+        return wrapper.getJSONProcess();
+    }
+
+    public String getInstanceInfo(String instanceId) {
+        String result = "";
+        try {
+            String i_Info = connection.papi.instanceGetVariable(StringId.decode(instanceId), "i_Info");
+            result = Json.StringFormat(i_Info.substring(1, i_Info.length()-1), ",", "=");
+        } catch (OperationException_Exception e) {
+            e.printStackTrace();
+        }
+        return result;
     }
 
     public void testVars() {
@@ -39,55 +79,40 @@ public class PapiService {
         }
     }
 
-    public String getInstances() {
-        ProcessWrapper wrapper = new ProcessWrapper();
-        try {
-            for (InstanceInfoBean instance : connection.papi.viewGetInstances("papi-bridge").getInstances()) {
-
-                String i_Info = connection.papi.instanceGetVariable(instance.getId(), "i_Info");
-                System.out.println(i_Info);
-
-                wrapper.addInstance(
-                        instance.getProcess(),
-                        connection.papi.processGet(instance.getProcess()).getName(),
-                        instance.getActivityName(),
-                        new Instance(
-                                instance.getId(),
-                                instance.getDescription(),
-                                instance.getState(),
-                                instance.getReceptionTime(),
-                                instance.getProcessDeadline()
-                        )
-                );
-            }
-        } catch (OperationException_Exception e) {
-            e.printStackTrace();
-        }
-
-        return wrapper.getJSONProcess();
-    }
-
 
 
 
     public void deveria(InstanceInfoBean instance) {
+
         try {
+            List<ArgumentSetBean> beginArgumentSets = connection.papi.processGet(instance.getProcess()).getBeginArgumentSets();
+
+            for ( ArgumentSetBean x : beginArgumentSets) {
+                System.out.println(x.getName());
+
+                for (ArgumentBean f : x.getArguments()) {
+                    System.out.println(f.getName());
+                    System.out.println(f.getType());
+                    System.out.println();
+                }
+                System.out.println();
+            }
+
             ArgumentsBean bean = new ArgumentsBean();
 
             ArgumentsBean.Arguments arg = new ArgumentsBean.Arguments();
             ArgumentsBean.Arguments.Entry entry = new ArgumentsBean.Arguments.Entry();
-            entry.setKey("a_ResultadoAnalisis");
+            entry.setKey("a_ExternalResult");
             entry.setValue("Aprobo");
             arg.getEntry().add(entry);
 
             bean.setArguments(arg);
 
-            connection.papi.processSendNotification(instance.getProcess(), "Espera", "EsperaIn", bean);
+            connection.papi.processSendNotification(instance.getId(), "PapiBridgeListener", "PapiBridgeListenerIn", bean);
+
         } catch (OperationException_Exception e) {
             e.printStackTrace();
         }
-
-
     }
 
     // activitie and instance

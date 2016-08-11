@@ -27,8 +27,6 @@ public class AuthController {
             headers = "content-type=application/json"
     )
     public ResponseEntity<String> login(@RequestBody User user) {
-        System.out.println(user.getUsername());
-        System.out.println(user.getPassword());
         try {
             new PapiService(user.getUsername(), user.getPassword()).getCurrentParticipant();
 

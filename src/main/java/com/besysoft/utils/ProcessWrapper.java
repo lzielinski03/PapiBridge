@@ -41,16 +41,12 @@ public class ProcessWrapper {
                         if (!isActivityAdded)
                             process.activities.add(new Activity(activityName, instance));
                     }
-
-                    //process.activities.get(0).instances.add(instance);
                     isProcessAdded = true;
                 }
             }
             // not find process, add new
             if (!isProcessAdded)
                 this.processes.add(new Process(processId, processName, new Activity(activityName, instance)));
-            //                this.processes.add(new Process(processId, processName, instance));
-
         }
     }
 

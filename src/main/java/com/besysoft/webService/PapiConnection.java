@@ -62,7 +62,7 @@ public class PapiConnection {
         request.put(BindingProvider.PASSWORD_PROPERTY, this.password);
     }
 
-    private static void addUsernameTokenProfile(PapiWebService papiWebServicePort) throws SOAPException {
+    private void addUsernameTokenProfile(PapiWebService papiWebServicePort) throws SOAPException {
         SOAPFactory soapFactory = SOAPFactory.newInstance();
         QName securityQName = new QName(SECURITY_NAMESPACE, "Security");
         SOAPElement security = soapFactory.createElement(securityQName);
@@ -70,10 +70,11 @@ public class PapiConnection {
         SOAPElement token = soapFactory.createElement(tokenQName);
         QName userQName = new QName(SECURITY_NAMESPACE, "Username");
         SOAPElement username = soapFactory.createElement(userQName);
-        username.addTextNode("test");
+        //username.addTextNode("test");
+        username.addTextNode(this.username);
         QName passwordQName = new QName(SECURITY_NAMESPACE, "Password");
         SOAPElement password = soapFactory.createElement(passwordQName);
-        password.addTextNode("test");
+        password.addTextNode(this.password);
         token.addChildElement(username);
         token.addChildElement(password);
         security.addChildElement(token);

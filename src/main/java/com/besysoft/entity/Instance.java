@@ -1,11 +1,12 @@
 package com.besysoft.entity;
 
 import javax.xml.datatype.XMLGregorianCalendar;
+import java.io.Serializable;
 
 /**
  * Created by lzielinski on 12/07/2016.
  */
-public class Instance {
+public class Instance implements Serializable{
 
     public String id;
     public String description;
@@ -28,7 +29,7 @@ public class Instance {
         public String hora;
         public String min;
 
-        public StringDate(XMLGregorianCalendar date) {
+        private StringDate(XMLGregorianCalendar date) {
             this.anio = Integer.toString(date.getYear());
             this.mes = Integer.toString(date.getMonth());
             this.dia = Integer.toString(date.getDay());
